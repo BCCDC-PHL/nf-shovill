@@ -1,0 +1,6 @@
+name: nf-shovill
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - bioconda::shovill=1.4.1
