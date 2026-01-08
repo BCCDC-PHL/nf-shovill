@@ -31,11 +31,13 @@ nextflow run BCCDC-PHL/nf_shovill \
 | --threads           | 8                          | CPU threads per sample                     |
 | --assembler         | spades                     | Shovill assembler (spades, skesa, megahit) |
 | --samplesheet_input | NO_FILE                    | CSV samplesheet path                       |
-| --fastq_search_path | Required if no samplesheet | FASTQ search pattern                       |
+| --fastq_input       | Required if no samplesheet | FASTQ search pattern                       |
 
 ## Output
 
+```bash
 results/
 ├── sample1_contigs.fa
 ├── sample2_contigs.fa
 └── ...
+```
