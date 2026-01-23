@@ -35,7 +35,7 @@ nextflow run BCCDC-PHL/nf_shovill \
 
 ## Output
 
-```bash
+```
 results/
 ├── sample1_contigs.fa
 ├── sample2_contigs.fa
