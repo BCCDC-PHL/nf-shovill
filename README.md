@@ -29,15 +29,17 @@ nextflow run BCCDC-PHL/nf_shovill \
 | ------------------- | -------------------------- | ------------------------------------------ |
 | --outdir            | ./results                  | Output directory                           |
 | --threads           | 8                          | CPU threads per sample                     |
-| --assembler         | spades                     | Shovill assembler (spades, skesa, megahit) |
+| --assembler         | skesa                      | Shovill assembler (spades, skesa, megahit) |
 | --samplesheet_input | NO_FILE                    | CSV samplesheet path                       |
 | --fastq_input       | Required if no samplesheet | FASTQ search pattern                       |
 
 ## Output
 
 ```
-results/
+sample1/
 ├── sample1_contigs.fa
-├── sample2_contigs.fa
-└── ...
+├── sample1_shovill.log
+├── sample1_shovill_provenance.yml
+└── 
+...
 ```
