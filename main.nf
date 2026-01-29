@@ -3,6 +3,8 @@ nextflow.enable.dsl=2
 
 params.threads = 8
 
+include { fastp }               from './modules/qc.nf'
+include { cutadapter }          from './modules/qc.nf'
 
 process RUN_SHOVILL {
     tag "$sample_id"
@@ -34,7 +36,25 @@ process RUN_SHOVILL {
     cp contigs.fa ${sample_id}_contigs.fa
     """
 }
+process collect_provenance {
 
+    tag { sample_id }
+
+    executor 'local'
+
+    publishDir "${params.outdir}/${sample_id}", pattern: "${sample_id}_*_provenance.yml", mode: 'copy'
+
+    input:
+    tuple val(sample_id), path(provenance_files)
+
+    output:
+    tuple val(sample_id), file("${sample_id}_*_provenance.yml")
+
+    script:
+    """
+    cat ${provenance_files} > ${sample_id}_\$(date +%Y%m%d%H%M%S)_provenance.yml
+    """
+}
 process pipeline_provenance {
 
     tag { pipeline_name + " / " + pipeline_version }
@@ -78,6 +98,14 @@ workflow {
 
     }
     //Ch_rd = Channel.fromFilePairs(params.reads, flat: true).map{ it -> [it[0].split('_')[0], it[1], it[2]] }.unique{ it -> it[0] }
-    RUN_SHOVILL(ch_fastq)
+    fastp( ch_fastq )
+    cutadapter(fastp.out.trimmed_reads)
+    RUN_SHOVILL(cutadapter.out.out_reads)
 
+    ch_provenance = ch_fastq.map{ it -> it[0] }
+    ch_provenance = ch_provenance.combine(ch_pipeline_provenance).map{ it -> [it[0], [it[1]]] }
+    ch_provenance = ch_provenance.join(fastp.out.provenance).map{ it -> [it[0], it[1] << it[2]] }
+    ch_provenance = ch_provenance.join(cutadapter.out.provenance).map{ it -> [it[0], it[1] << it[2]] }
+    ch_provenance = ch_provenance.join(RUN_SHOVILL.out.provenance).map{ it -> [it[0], it[1] << it[2]] }
+    collect_provenance(ch_provenance)
 }
