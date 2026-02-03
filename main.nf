@@ -10,8 +10,8 @@ include { parse_quast_report }         from './modules/quast.nf'
 
 process RUN_SHOVILL {
     tag "$sample_id"
-    publishDir "${params.outdir}/${sample_id}", mode: 'copy'
-
+    publishDir "${params.outdir}/${sample_id}_contigs.fa", mode: 'copy'
+    publishDir "${params.outdir}/${sample_id}_shovill.log", mode: 'copy'
 
     input:
     tuple val(sample_id), path(reads_1), path(reads_2)
@@ -104,7 +104,7 @@ workflow {
     cutadapter(fastp.out.trimmed_reads)
     RUN_SHOVILL(cutadapter.out.out_reads)
 
-    quast(RUN_SHOVILL.out.assembly)
+    quast(RUN_SHOVILL.out.contigs)
     parse_quast_report(quast.out.tsv)
 
     ch_provenance = ch_fastq.map{ it -> it[0] }
