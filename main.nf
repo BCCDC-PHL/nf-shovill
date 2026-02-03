@@ -3,8 +3,10 @@ nextflow.enable.dsl=2
 
 params.threads = 8
 
-include { fastp }               from './modules/qc.nf'
-include { cutadapter }          from './modules/qc.nf'
+include { fastp }                      from './modules/qc.nf'
+include { cutadapter }                 from './modules/qc.nf'
+include { quast }                      from './modules/quast.nf'
+include { parse_quast_report }         from './modules/quast.nf'
 
 process RUN_SHOVILL {
     tag "$sample_id"
@@ -102,10 +104,14 @@ workflow {
     cutadapter(fastp.out.trimmed_reads)
     RUN_SHOVILL(cutadapter.out.out_reads)
 
+    quast(RUN_SHOVILL.out.assembly)
+    parse_quast_report(quast.out.tsv)
+
     ch_provenance = ch_fastq.map{ it -> it[0] }
     ch_provenance = ch_provenance.combine(ch_pipeline_provenance).map{ it -> [it[0], [it[1]]] }
     ch_provenance = ch_provenance.join(fastp.out.provenance).map{ it -> [it[0], it[1] << it[2]] }
     ch_provenance = ch_provenance.join(cutadapter.out.provenance).map{ it -> [it[0], it[1] << it[2]] }
     ch_provenance = ch_provenance.join(RUN_SHOVILL.out.provenance).map{ it -> [it[0], it[1] << it[2]] }
+    ch_provenance = ch_provenance.join(quast.out.provenance).map{ it -> [it[0], it[1] << it[2]] }
     collect_provenance(ch_provenance)
 }

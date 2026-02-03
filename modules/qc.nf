@@ -10,9 +10,9 @@ process fastp {
 
     output:
     tuple val(sample_id), path("${sample_id}_trim_R1.fastq.gz"), path("${sample_id}_trim_R2.fastq.gz"), emit: trimmed_reads
-    //tuple val(sample_id), path("${sample_id}_fastp.json"), emit: json
+    tuple val(sample_id), path("${sample_id}_fastp.json"), emit: json
     tuple val(sample_id), path("${sample_id}_fastp_provenance.yml"), emit: provenance
-    //tuple val(sample_id), path("${sample_id}_fastp.csv")            , emit: metrics
+    tuple val(sample_id), path("${sample_id}_fastp.csv")            , emit: metrics
     tuple val(sample_id), path("${sample_id}_fastp.json")           , emit: report_json
     tuple val(sample_id), path("${sample_id}_fastp.html")           , emit: report_html
 
@@ -33,6 +33,8 @@ process fastp {
       --report_title "fastp report: ${sample_id}" \
       --json ${sample_id}_fastp.json \
       --html ${sample_id}_fastp.html
+    
+    fastp_json_to_csv.py -s ${sample_id} ${sample_id}_fastp.json > ${sample_id}_fastp.csv
 
     """
 }

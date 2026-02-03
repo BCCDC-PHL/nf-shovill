@@ -6,3 +6,4 @@ dependencies:
   - fastp
   - cutadapt
   - bioconda::shovill=1.4.1
+  - quast
