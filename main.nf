@@ -10,8 +10,8 @@ include { parse_quast_report }         from './modules/quast.nf'
 
 process RUN_SHOVILL {
     tag "$sample_id"
-    publishDir "${params.outdir}/${sample_id}_contigs.fa", mode: 'copy'
-    publishDir "${params.outdir}/${sample_id}_shovill.log", mode: 'copy'
+    publishDir "${params.outdir}/${sample_id}", pattern: "${sample_id}_contigs.fa", mode: 'copy'
+    publishDir "${params.outdir}/${sample_id}", pattern: "${sample_id}_shovill.log", mode: 'copy'
 
     input:
     tuple val(sample_id), path(reads_1), path(reads_2)
